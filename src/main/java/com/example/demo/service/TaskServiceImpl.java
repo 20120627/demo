@@ -29,5 +29,18 @@ public class TaskServiceImpl implements TaskService {
                 .collect(Collectors.toList());
         return new ResponseDto<>(TaskDtoList, "Success get all list of all Tasks!");
     }
-    
+
+    @Override
+    public ResponseDto<TaskDto> addTask(TaskDto taskDto) {
+        Task task  = Task.builder()
+                .title(taskDto.getTitle())
+                .description(taskDto.getDescription())
+                .dueDate(taskDto.getDueDate())
+                .priority(taskDto.getPriority())
+                .build();
+        Task savedTask = TaskRepository.save(task);
+        TaskDto savedTaskDto = new TaskDto(savedTask);
+        return new ResponseDto<>(savedTaskDto, "Success add new Task!");
+        
+    }
 }

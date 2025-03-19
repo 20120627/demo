@@ -9,13 +9,16 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.Value;
+import lombok.NoArgsConstructor;
+import lombok.Data;
 
+@Data
+@NoArgsConstructor
 @AllArgsConstructor
 @Getter
 @Setter
-@Value
 public class TaskDto implements Serializable {
-    Long id;
+    int id;
     String title;
     String description;
     LocalDate dueDate;
