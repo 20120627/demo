@@ -44,4 +44,24 @@ public class TaskServiceImpl implements TaskService {
         TaskDto savedTaskDto = new TaskDto(savedTask);
         return new ResponseDto<>(savedTaskDto, "Success add new Task!");
     }
+
+    @Transactional
+    @Override
+    public ResponseDto<TaskDto> updateTask(int id, TaskDto taskDto) {
+        Task task = taskRepository.findById(id).orElseThrow(() -> new RuntimeException("Task not found"));
+        task.setTitle(taskDto.getTitle());
+        task.setDescription(taskDto.getDescription());
+        task.setDueDate(taskDto.getDueDate());
+        task.setPriority(taskDto.getPriority());
+        Task updatedTask = taskRepository.save(task);
+        TaskDto updatedTaskDto = new TaskDto(updatedTask);
+        return new ResponseDto<>(updatedTaskDto, "Task updated successfully");
+    }
+
+    @Transactional
+    @Override
+    public ResponseDto<TaskDto> deleteTask(int id) {
+        taskRepository.deleteTask(id);
+        return new ResponseDto<>(null, "Success delete Task!");
+    }
 }
