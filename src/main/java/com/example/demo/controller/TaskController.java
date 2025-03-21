@@ -39,28 +39,33 @@ public class TaskController {
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 
-    @PutMapping("/update/{id}")
+    @PutMapping("{id}/update")
     public ResponseEntity<ResponseDto<TaskDto>> updateTask(@PathVariable int id, @RequestBody TaskDto taskDto) {
         ResponseDto<TaskDto> response = taskService.updateTask(id, taskDto);
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 
-    @DeleteMapping("/delete/{id}")
+    @DeleteMapping("{id}/delete")
     public ResponseEntity<ResponseDto<TaskDto>> deleteTask(@PathVariable int id) {
         ResponseDto<TaskDto> response = taskService.deleteTask(id);
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 
-    @PutMapping("update/dependency/{id}")
+    @PutMapping("{id}/update/dependency")
     public ResponseEntity<ResponseDto<TaskDto>> updateTaskDependency(@PathVariable int id, @RequestBody Map<String, Integer> request) {
         Integer dependentTaskId = request.get("dependentTaskId");
         ResponseDto<TaskDto> response = taskService.updateTaskDependency(id, dependentTaskId);
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }
     
-    @PutMapping("delete/dependency/{id}")
+    @PutMapping("{id}/delete/dependency")
     public ResponseEntity<ResponseDto<TaskDto>> deleteTaskDependency(@PathVariable int id) {
         ResponseDto<TaskDto> response = taskService.deleteTaskDependency(id);
+        return ResponseEntity.status(HttpStatus.OK).body(response);
+    }
+    @GetMapping("{id}/dependencies")
+    public ResponseEntity<ResponseDto<List<TaskDto>>> getAllDependencies(@PathVariable int id) {
+        ResponseDto<List<TaskDto>> response = taskService.getAllDependencies(id);
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 }

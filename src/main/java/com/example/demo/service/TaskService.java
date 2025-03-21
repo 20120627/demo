@@ -12,4 +12,5 @@ public interface TaskService {
     ResponseDto<TaskDto> deleteTask(int id);
     ResponseDto<TaskDto> updateTaskDependency(int id, Integer dependentTaskId);
     ResponseDto<TaskDto> deleteTaskDependency(int id);
+    ResponseDto<List<TaskDto>> getAllDependencies(int id);
 }

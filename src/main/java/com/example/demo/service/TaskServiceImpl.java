@@ -1,5 +1,6 @@
 package com.example.demo.service;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -96,4 +97,27 @@ public class TaskServiceImpl implements TaskService {
             return new ResponseDto<>(null, "Task with id not found");
         }
     }
+
+    @Transactional
+    @Override
+    public ResponseDto<List<TaskDto>> getAllDependencies(int id) {
+        List<TaskDto> dependencies = new ArrayList<>();
+        fetchDependencies(id, dependencies);
+        return new ResponseDto<>(dependencies, "Success get all dependencies of Task!");
+    }
+
+    private void fetchDependencies(int id, List<TaskDto> dependencies) {
+        Optional<Task> taskOptional = taskRepository.findById(id);
+        if (taskOptional.isPresent()) {
+            Task task = taskOptional.get();
+            if (task.getDependentTaskId() != null) {
+                Task dependentTask = taskRepository.findById(task.getDependentTaskId()).orElse(null);
+                if (dependentTask != null) {
+                    TaskDto dependentTaskDto = new TaskDto(dependentTask);
+                    dependencies.add(dependentTaskDto);
+                    fetchDependencies(dependentTask.getId(), dependencies);
+                }
+            }
+        }
+}
 }
