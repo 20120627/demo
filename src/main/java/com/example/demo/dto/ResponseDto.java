@@ -12,4 +12,9 @@ import lombok.Setter;
 public class ResponseDto<T> {
     private T data;
     private String message;
+    private boolean success;
+
+    public boolean isSuccess() {
+        return success;
+    }
 }

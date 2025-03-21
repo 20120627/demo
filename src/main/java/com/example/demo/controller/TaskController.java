@@ -55,7 +55,13 @@ public class TaskController {
     public ResponseEntity<ResponseDto<TaskDto>> updateTaskDependency(@PathVariable int id, @RequestBody Map<String, Integer> request) {
         Integer dependentTaskId = request.get("dependentTaskId");
         ResponseDto<TaskDto> response = taskService.updateTaskDependency(id, dependentTaskId);
-        return ResponseEntity.status(HttpStatus.OK).body(response);
+        if (response.isSuccess()) {
+            return ResponseEntity.status(HttpStatus.OK).body(response);
+        } else if ("Circular dependency detected".equals(response.getMessage())) {
+            return ResponseEntity.status(HttpStatus.CONFLICT).body(response);
+        } else {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
+        }
     }
     
     @PutMapping("{id}/delete/dependency")

@@ -30,7 +30,7 @@ public class TaskServiceImpl implements TaskService {
         List<TaskDto> taskDtoList = taskList.stream()
                 .map(TaskDto::new)
                 .collect(Collectors.toList());
-        return new ResponseDto<>(taskDtoList, "Success get all list of all Tasks!");
+        return new ResponseDto<>(taskDtoList, "Success get all list of all Tasks!",true);
     }
 
     @Transactional
@@ -46,7 +46,7 @@ public class TaskServiceImpl implements TaskService {
                 .build();
         var savedTask = taskRepository.save(task);
         TaskDto savedTaskDto = new TaskDto(savedTask);
-        return new ResponseDto<>(savedTaskDto, "Success add new Task!");
+        return new ResponseDto<>(savedTaskDto, "Success add new Task!",true);
     }
 
     @Transactional
@@ -58,32 +58,35 @@ public class TaskServiceImpl implements TaskService {
         task.setDueDate(taskDto.getDueDate());
         task.setPriority(taskDto.getPriority());
         task.setCompleted(taskDto.isCompleted());
-        task.setDependentTaskId(taskDto.getDependentTaskId());
         Task updatedTask = taskRepository.save(task);
         TaskDto updatedTaskDto = new TaskDto(updatedTask);
-        return new ResponseDto<>(updatedTaskDto, "Task updated successfully");
+        return new ResponseDto<>(updatedTaskDto, "Task updated successfully",true);
     }
 
     @Transactional
     @Override
     public ResponseDto<TaskDto> deleteTask(int id) {
         taskRepository.deleteTask(id);
-        return new ResponseDto<>(null, "Success delete Task!");
+        return new ResponseDto<>(null, "Success delete Task!",true);
     }
 
     @Transactional
     @Override
     public ResponseDto<TaskDto> updateTaskDependency(int id, Integer dependentTaskId) {
+        if (isCircularDependency(id, dependentTaskId)) {
+            return new ResponseDto<>(null, "Circular dependency detected", false);
+        }
         Optional<Task> taskOptional = taskRepository.findById(id);
         if (taskOptional.isPresent()) {
             taskRepository.updateTaskDependency(id, dependentTaskId);
             Task updatedTask = taskRepository.findById(id).get();
             TaskDto taskDto = new TaskDto(updatedTask);
-            return new ResponseDto<>(taskDto, "Task dependency updated successfully");
+            return new ResponseDto<>(taskDto, "Task dependency updated successfully", true);
         } else {
-            return new ResponseDto<>(null, "Task with id not found");
+            return new ResponseDto<>(null, "Task with id not found", false);
         }
     }
+
     @Transactional
     @Override
     public ResponseDto<TaskDto> deleteTaskDependency(int id) {
@@ -92,9 +95,9 @@ public class TaskServiceImpl implements TaskService {
             taskRepository.deleteTaskDependency(id);
             Task updatedTask = taskRepository.findById(id).get();
             TaskDto taskDto = new TaskDto(updatedTask);
-            return new ResponseDto<>(taskDto, "Task dependency deleted successfully");
+            return new ResponseDto<>(taskDto, "Task dependency deleted successfully",true);
         } else {
-            return new ResponseDto<>(null, "Task with id not found");
+            return new ResponseDto<>(null, "Task with id not found",false);
         }
     }
 
@@ -104,7 +107,7 @@ public class TaskServiceImpl implements TaskService {
         List<TaskDto> dependencies = new ArrayList<>();
         fetchDependencies(id, dependencies);
         fetchDependents(id, dependencies);
-        return new ResponseDto<>(dependencies, "Success get all dependencies of Task!");
+        return new ResponseDto<>(dependencies, "Success get all dependencies of Task!",true);
     }
 
     private void fetchDependencies(int id, List<TaskDto> dependencies) {
@@ -129,5 +132,24 @@ public class TaskServiceImpl implements TaskService {
             dependencies.add(dependentTaskDto);
             fetchDependents(dependentTask.getId(), dependencies);
         }
+    }
+
+    private boolean isCircularDependency(int taskId, Integer dependentTaskId) {
+        if (dependentTaskId == null) {
+            return false;
+        }
+        Integer currentTaskId = dependentTaskId;
+        while (currentTaskId != null) {
+            if (currentTaskId == taskId) {
+                return true;
+            }
+            Optional<Task> taskOptional = taskRepository.findById(currentTaskId);
+            if (taskOptional.isPresent()) {
+                currentTaskId = taskOptional.get().getDependentTaskId();
+            } else {
+                currentTaskId = null;
+            }
+        }
+        return false;
     }
 }
