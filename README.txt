@@ -1,5 +1,6 @@
 SPRING BOOT APPLICATION FOR TASK MANAGER (TODO)
 
+PG ADMIN: run sql query to create table task
 INIT: VSCode >spring initializr
 
 -Controller: Handles HTTP requests and maps them to service methods.
