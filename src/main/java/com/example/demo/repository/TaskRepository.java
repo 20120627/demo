@@ -42,4 +42,7 @@ public interface TaskRepository extends JpaRepository<Task, Integer> {
     @Transactional
     @Query("UPDATE Task SET dependentTaskId = NULL WHERE id = :id")
     void deleteTaskDependency(@Param("id") int id);
+
+    @Query("SELECT t FROM Task t WHERE t.dependentTaskId = :id")
+    List<Task> findByDependentTaskId(@Param("id") int id);
 }

@@ -103,6 +103,7 @@ public class TaskServiceImpl implements TaskService {
     public ResponseDto<List<TaskDto>> getAllDependencies(int id) {
         List<TaskDto> dependencies = new ArrayList<>();
         fetchDependencies(id, dependencies);
+        fetchDependents(id, dependencies);
         return new ResponseDto<>(dependencies, "Success get all dependencies of Task!");
     }
 
@@ -119,5 +120,14 @@ public class TaskServiceImpl implements TaskService {
                 }
             }
         }
-}
+    }
+
+    private void fetchDependents(int id, List<TaskDto> dependencies) {
+        List<Task> dependentTasks = taskRepository.findByDependentTaskId(id);
+        for (Task dependentTask : dependentTasks) {
+            TaskDto dependentTaskDto = new TaskDto(dependentTask);
+            dependencies.add(dependentTaskDto);
+            fetchDependents(dependentTask.getId(), dependencies);
+        }
+    }
 }
