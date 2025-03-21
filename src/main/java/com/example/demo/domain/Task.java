@@ -39,4 +39,10 @@ public class Task {
 
     @Column(name = "priority")
     private int priority;
+
+    @Column(name = "completed")
+    private boolean completed;
+
+    @Column(name = "dependent_task_id")
+    private Integer dependentTaskId; // Changed from int to Integer
 }

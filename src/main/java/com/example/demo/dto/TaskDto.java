@@ -6,10 +6,10 @@ import java.time.LocalDate;
 import com.example.demo.domain.Task;
 
 import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.Setter;
-import lombok.NoArgsConstructor;
 import lombok.Data;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 @Data
 @NoArgsConstructor
@@ -22,6 +22,8 @@ public class TaskDto implements Serializable {
     String description;
     LocalDate dueDate;
     int priority;
+    boolean completed;
+    Integer dependentTaskId; // Changed from int to Integer
 
     public TaskDto(Task task) {
         this.id = task.getId();
@@ -29,5 +31,7 @@ public class TaskDto implements Serializable {
         this.description = task.getDescription();
         this.dueDate = task.getDueDate();
         this.priority = task.getPriority();
+        this.completed = task.isCompleted();
+        this.dependentTaskId = task.getDependentTaskId();
     }
 }

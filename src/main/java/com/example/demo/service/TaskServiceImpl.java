@@ -1,6 +1,7 @@
 package com.example.demo.service;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,11 +25,11 @@ public class TaskServiceImpl implements TaskService {
 
     @Override
     public ResponseDto<List<TaskDto>> getTaskList() {
-        List<Task> TaskList = taskRepository.getTaskList(PageRequest.of(0, 10));
-        List<TaskDto> TaskDtoList = TaskList.stream()
+        List<Task> taskList = taskRepository.getTaskList(PageRequest.of(0, 10));
+        List<TaskDto> taskDtoList = taskList.stream()
                 .map(TaskDto::new)
                 .collect(Collectors.toList());
-        return new ResponseDto<>(TaskDtoList, "Success get all list of all Tasks!");
+        return new ResponseDto<>(taskDtoList, "Success get all list of all Tasks!");
     }
 
     @Transactional
@@ -39,6 +40,8 @@ public class TaskServiceImpl implements TaskService {
                 .description(taskDto.getDescription())
                 .dueDate(taskDto.getDueDate())
                 .priority(taskDto.getPriority())
+                .completed(taskDto.isCompleted())
+                .dependentTaskId(taskDto.getDependentTaskId())
                 .build();
         var savedTask = taskRepository.save(task);
         TaskDto savedTaskDto = new TaskDto(savedTask);
@@ -53,6 +56,8 @@ public class TaskServiceImpl implements TaskService {
         task.setDescription(taskDto.getDescription());
         task.setDueDate(taskDto.getDueDate());
         task.setPriority(taskDto.getPriority());
+        task.setCompleted(taskDto.isCompleted());
+        task.setDependentTaskId(taskDto.getDependentTaskId());
         Task updatedTask = taskRepository.save(task);
         TaskDto updatedTaskDto = new TaskDto(updatedTask);
         return new ResponseDto<>(updatedTaskDto, "Task updated successfully");
@@ -63,5 +68,19 @@ public class TaskServiceImpl implements TaskService {
     public ResponseDto<TaskDto> deleteTask(int id) {
         taskRepository.deleteTask(id);
         return new ResponseDto<>(null, "Success delete Task!");
+    }
+
+    @Transactional
+    @Override
+    public ResponseDto<TaskDto> updateTaskDependency(int id, Integer dependentTaskId) {
+        Optional<Task> taskOptional = taskRepository.findById(id);
+        if (taskOptional.isPresent()) {
+            taskRepository.updateTaskDependency(id, dependentTaskId);
+            Task updatedTask = taskRepository.findById(id).get();
+            TaskDto taskDto = new TaskDto(updatedTask);
+            return new ResponseDto<>(taskDto, "Task dependency updated successfully");
+        } else {
+            return new ResponseDto<>(null, "Task with id not found");
+        }
     }
 }
