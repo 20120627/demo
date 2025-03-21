@@ -18,6 +18,8 @@ public interface TaskRepository extends JpaRepository<Task, Integer> {
     @Query("SELECT t FROM Task t")
     List<Task> getTaskList(Pageable pageable);
 
+    @Modifying
+    @Transactional
     @Query("Insert into Task (title, description, dueDate, priority) values (:title, :description, :dueDate, :priority)")
     void addTask(String title, String description, LocalDate dueDate, int priority);
    
@@ -30,9 +32,14 @@ public interface TaskRepository extends JpaRepository<Task, Integer> {
     @Transactional
     @Query("Delete from Task where id = :id")
     void deleteTask(int id);
-    
+
     @Modifying
     @Transactional
     @Query("UPDATE Task SET dependentTaskId = :dependentTaskId WHERE id = :id")
     void updateTaskDependency(@Param("id") int id, @Param("dependentTaskId") int dependentTaskId);
+
+    @Modifying
+    @Transactional
+    @Query("UPDATE Task SET dependentTaskId = NULL WHERE id = :id")
+    void deleteTaskDependency(@Param("id") int id);
 }

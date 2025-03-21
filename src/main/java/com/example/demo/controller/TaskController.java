@@ -58,4 +58,9 @@ public class TaskController {
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }
     
+    @PutMapping("delete/dependency/{id}")
+    public ResponseEntity<ResponseDto<TaskDto>> deleteTaskDependency(@PathVariable int id) {
+        ResponseDto<TaskDto> response = taskService.deleteTaskDependency(id);
+        return ResponseEntity.status(HttpStatus.OK).body(response);
+    }
 }

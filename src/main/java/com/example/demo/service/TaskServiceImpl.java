@@ -83,4 +83,17 @@ public class TaskServiceImpl implements TaskService {
             return new ResponseDto<>(null, "Task with id not found");
         }
     }
+    @Transactional
+    @Override
+    public ResponseDto<TaskDto> deleteTaskDependency(int id) {
+        Optional<Task> taskOptional = taskRepository.findById(id);
+        if (taskOptional.isPresent()) {
+            taskRepository.deleteTaskDependency(id);
+            Task updatedTask = taskRepository.findById(id).get();
+            TaskDto taskDto = new TaskDto(updatedTask);
+            return new ResponseDto<>(taskDto, "Task dependency deleted successfully");
+        } else {
+            return new ResponseDto<>(null, "Task with id not found");
+        }
+    }
 }
